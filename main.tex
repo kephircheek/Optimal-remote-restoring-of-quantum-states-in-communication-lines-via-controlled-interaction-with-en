@@ -150,7 +150,7 @@ The paper is organized as follows. In Sec.~\ref{Section:T}, we consider the gene
 \label{Section:T}
 
 We consider evolution of a quantum system interacting with 	environment. Such evolution is described by the  Landblad equation
-\begin{eqnarray}\label{rho0}
+\begin{eqnarray}\label{rho00}
  \rho_t(t)&=&-i (H\rho(t) - \rho(t) H) +\\\nonumber
 && \sum_{i=1}^N \Big(L_i(t) \rho(t) L_i^\dagger(t)
 -\frac{1}{2} L_i^2(t)\rho(t) -\frac{1}{2} \rho(t) (L_i^+(t))^2\Big).
@@ -175,24 +175,24 @@ Then, formally we can represent the evolution $\rho$ as follows:
 \rho_{nm}(t)=\sum_{{i,j=0}\atop{|i|=|n|, |j|=|m|} }^{N^{(S)}-1} W_{nm;ij}(t)\rho_{ij}^{(S)}(0) ,\;\;n,m=0,\dots,2^N-1,
 \end{eqnarray}
 where $|n|$ is the number of units in the binary representation of the index $n$,
- $W(t)$ is  evolution operator predicted by Eq.(\ref{rho0})
+ $W(t)$ is  evolution operator defined  by Eq.(\ref{rho00})
 with the initial condition
 \begin{eqnarray}\label{ic}
 W_{nm;ij}(0) =
  \delta_{ni}\delta_{mj},\;\;i,j,n,m=0,\dots,2^{N}-1.
 \end{eqnarray}
-Notice, that evolution conserving the excitation number in the system induces the following property for the operator $W_{nm;ij}$:
+Notice, that evolution conserving the excitation number in the system induces the following constraints  for the subscripts of the  operator $W_{nm;ij}$:
 \begin{eqnarray}
 W_{nm;ij}: \;\;|i|=|n|,\;\;|j| = |m|,
 \end{eqnarray}
 which is reflected in the sum in  (\ref{rhonm}).
 
 
-The Hamiltonian preserving the excitation number must commute with the $z$-projection of the total spin momentum $Z=\sum Z_i$,
+The Hamiltonian preserving the excitation number must commute with the $z$-projection of the total spin momentum $Z=\sum Z_i$, $Z_i$ is the operator of $z$-projection of the $i$th spin momentum.
 \begin{eqnarray}\label{com0}\label{com}
 [H,Z]=0,
 \end{eqnarray}
-In turn, commutation relation (\ref{com0}) assumes the block-diagonal structure of the Hamiltonian written in the basis with ordered number of excitations,
+In turn, commutation relation (\ref{com0}) imposes the block-diagonal structure for  the Hamiltonian written in the basis with ordered number of excitations,
 \begin{eqnarray}\label{bH}
 H={\mbox{diag}} (H^{(0)},H^{(1)},\dots ),
 \end{eqnarray}
@@ -201,44 +201,64 @@ The same diagonal block-structure is required for $L_i$:
 \begin{eqnarray}\label{bH}
 L_i={\mbox{diag}} (L_i^{(0)},L_i^{(1)},\dots ), \;\; i=1,\dots,N.
 \end{eqnarray}
-Without loss of generality, we set
-\begin{eqnarray}\label{bH0}
-H^{(0)}=0,
-\end{eqnarray}
-i.e., 0-excitation state of the spin chain does not evolve under the Hamiltonian.
+%Without loss of generality, we set
+%\begin{eqnarray}\label{bH0}
+%H^{(0)}=0,
+%\end{eqnarray}
+%i.e., 0-excitation state of the spin chain does not evolve under the Hamiltonian.
 We consider the restoring problem for the  nondiagonal elements of the receiver density matrix $\rho^{(R)}$,
-i.e. creation of such receiver matrix $\rho^{(R)}$ that
-\begin{eqnarray}\label{rest}
-\rho^{(R)}_{ij}(t_{\mathrm{reg}}) = \lambda_{ij} \rho^{(S)}_{ij}(0), \quad i\neq j,
-\end{eqnarray}
-where the receiver density matrix $\rho^{(R)}$ is obtained by taking partial trace:
 \begin{eqnarray}\label{R}
 \rho^{(R)}={\mbox{Tr}}_{S,TL}(\rho).
 \end{eqnarray}
-We shall emphasize that the scale parameters $\lambda_{ij}$ are universal, i.e., they do not depend on the element of  the initial sender's density matrix and are completely determined by the Hamiltonian and the selected time instant for state registration {$t_{\mathrm{reg}}$}.
+Calculating the partial trace in (\ref{rhonm}) we
+ split subscripts $n$, $m$, $i$ and $j$ as follows
+\begin{eqnarray}\label{SR}
+n\to (n_1 n_R), \;\;m\to (n_1 m_R),\;\;i\to (i_S 0),  \;\;j\to (j_S 0),
+\end{eqnarray}
+thus selecting nodes of  the receiver  and sender.
+Then
+\begin{eqnarray}
+\rho^{(R)}_{n_Rm_R} =\sum_{n_1} \sum_{i_Sj_S}W_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} \rho^{(S)}_{i_Sj_S}(0)  =\sum_{i_Sj_S} T_{n_Rm_R;i_Sj_S}  \rho^{(S)}_{i_Sj_S}(0)  ,
+% =\sum_{i_Sj_S}W_{(0 n_R)(0m_R);(i_S0)(j_S0)}  \rho^{(S)}_{i_Sj_S}(0) .
+\end{eqnarray}
+where
+\begin{eqnarray}
+T_{n_Rm_R;i_Sj_S} =\sum_{n_1}W_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} .
+\end{eqnarray}
+The restoring conditions read
+\begin{eqnarray}\label{restor1}\label{constr0}
+T_{n_Rm_R;i_Sj_S} =0, \;\;(i_S,j_S)\neq (n_R,m_R) .
+\end{eqnarray}
+In this case
+\begin{eqnarray}\label{rest}
+\rho^{(R)}_{i_Rj_R}(t_{\mathrm{reg}}) = \lambda_{i_Rj_R} \rho^{(S)}_{i_Rj_R}(0), \quad i\neq j,
+\end{eqnarray}
+with
+\begin{eqnarray}\label{lambda1}
+\lambda_{n_Rm_R} =T_{n_Rm_R;n_Rm_R}, \;\; n_R\neq m_R.
+\end{eqnarray}
 
-Density matrices $\rho^{(R)}$ and $\rho^{(S)}(0)$ are related as
-\begin{eqnarray}\label{rhoR}
-\rho^{(R)}_{nm} = \sum_{{|i|,|j|\le N^{(S)}}\atop{|m|-|n|=|j|-|i|}} T_{nm;ij}(t) \rho^{(S)}_{ij}, \;\;n,m = 0,\dots,2^{N^{(R)}}-1,
-\end{eqnarray}
-where matrix elements of $T$ are expressed in terms of matrix elements of $W$ as follows:
+We shall emphasize that the scale parameters $\lambda_{ij}$ are universal, i.e., they do not depend on the elements of  the initial sender's density matrix and are completely determined by the Hamiltonian and the selected time instant for state registration {$t_{\mathrm{reg}}$}.
+
+%Density matrices $\rho^{(R)}(t)$ and $\rho^{(S)}(0)$ are related as
+%\begin{eqnarray}\label{rhoR}
+%\rho^{(R)}_{nm}(t) = \sum_{i,j=0}^{N^{(S)}-1}T_{nm;ij}(t) \rho^{(S)}_{ij}(0), \;%\;n,m = 0,\dots,2^{N^{(R)}}-1,
+%\end{eqnarray}
+%where matrix elements of $T$ are expressed in terms of matrix elements of $W$ as
+%follows.
+
+\iffalse
+
+Then
 \begin{eqnarray}\label{TT}
-&&T_{nm;ij}=\sum_{{n_1=0 }\atop{|n_1|=|n|-|i|=|m|-|j|}}^{N-N^{(S)}-1}W_{(n_1n)(n_1m);ij}, \\\nonumber
-&&n,m=0,\dots,2^{N^{(R)}}-1,\;\;i,j=0,\dots,2^{N^{(S)}}-1,\;\;|n_1| + |n| = |i|,\;\;
-|n_1|+|m|=|j|.
+&&T_{n_Rm_R;i_Sj_S}=\sum_{n_1=0 }^{N-N^{(S)}-1}W_{(n_1n)(n_1m);ij}, \\\nonumber
+&&n_R,m_R=0,\dots,2^{N^{(R)}}-1,\;\;i_S,j_S=0,\dots,2^{N^{(S)}}-1.
 \end{eqnarray}
-Here we assume the binary representation for the subscripts that allows us to split the first pair of indexes in $W$ in two parts (i.e., $nm\to  (n_1n)(n_1 m)$), where $n_1$  counts (in binary form) the number of states in $S\cup TL$.
+%Here we assume the binary representation for the subscripts that allows us to split
+%the first pair of indexes in $W$ in two parts (i.e., $nm\to  (n_1n)(n_1 m)$), where %$n_1$  counts (in binary form) the number of states in $S\cup TL$.
 The tensor $T$ transfers the initial  density matrix of the sender $S$  to the receiver $R$. Unlike, \cite{}, this operator can not be represented as  a composition of Kraus operators.
 
-%Writing the sum in (\ref{TT}), we take into account the constraint $|N|=|I|$ for
-%subscripts in  $U_{N;I}$ that  is required by the commutation relation
-%(\ref{com0}).
- Next, we have to satisfy the restoring constraint (\ref{rest}) for the non-diagonal elements of $\rho^{(R)}$.
-% implying  assumption (\ref{bH0}), which yields
-%\begin{eqnarray}
-%U_{0_S0_{TL}0_R; 0_S0_{TL}0_R}=1.
-%\end{eqnarray}
-Restoring conditions (\ref{rest})  presumes  the following definitions of  the $\lambda$-parameters:
+ Next, we express the $\lambda$-parameters in (\ref{rest}) in terms of the elements of $T$:
 \begin{eqnarray}\label{K}
 \lambda_{ij} &=&T_{ij;ij},\;\; i\neq j,\;\; i,j=0,\dots,2^{N^{(S)}}-1.
 \end{eqnarray}
@@ -252,12 +272,13 @@ For 1-excitation block we have
 \lambda_{ij} &=&T_{ij;ij}=\sum_{n_1 =0}^{2^{N-N^{(S)}}-1}W_{i n_1,jn_1 ;0j}=W_{i j ;ij}   ,\;\;i,j=0,\dots,2^{N^{(S)}}-1.
 \end{eqnarray}
 \fi
-For $i\neq j $ (nondiagonal elements of $\rho^{(R)}$) at time instant of state registration $t_{\mathrm{reg}}$ we have the restoring constraints
+The restoring constraints that provide restored structure (\ref{rest}) for $i\neq j $ (nondiagonal elements of $\rho^{(R)}$) at time instant of state registration $t_{\mathrm{reg}}$ read
 \begin{eqnarray}\label{constr0}\label{P1}
 T_{nm;ij}=0, \;\;\;(n,m)\neq (i,j), \;\;|n|=|i|,\;\;|m|=|j|.
 \end{eqnarray}
+\fi
 
-\section{Evolution under the Landblad operator with XX-Hamiltonian}
+\section{Evolution under the Landblad operator with XXZ-Hamiltonian}
 \label{Section:ev}
 We consider the evolution under the  Landbladian operator with XXZ-Hamiltonian and
 $L_i(t) = \sqrt{\gamma_i(t)} Z_{i}$. Since $Z_{i}^2=\frac{E}{4}$ ($E$ is the identity operator). Eq.(\ref{rho0}) gets the form
@@ -277,7 +298,7 @@ i&0
 %&&[H,Z]=0.
 \end{eqnarray}
 {Here $D_{ij}=\gamma^2/r_{ij}^3$ are the coupling constants between the $i$th and $j$th spins (for $\hbar=1$), $\gamma$ is the gyromagnetic ratio,
-$r_{ij}$  is the distance between the $i$th and $j$th spins}, and {$X_,\;\;Y_i$ are  the operators of, respectively, the $x$- and $y$-projections of the $i$th spin.} Of course, commutation condition (\ref{com}) is satisfied.
+$r_{ij}$  is the distance between the $i$th and $j$th spins}, and {$X_i,\;\;Y_i$ are  the operators of, respectively, the $x$- and $y$-projections of the $i$th spin.} Of course, commutation condition (\ref{com}) is satisfied.
 
 To satisfy constraints (\ref{constr0}), we introduce  the set of  $N^{(ER)}$ ($ER$ means the Extended Receiver) nonzero controls
 $\gamma_i(t)$, $i=N-N^{(ER)}+1, \dots, N$,
@@ -285,7 +306,7 @@ assuming
 \begin{eqnarray}
 \gamma_i=0,\quad  i=1,\dots,N-N^{(ER)}.
 \end{eqnarray}
-Non-zero $\gamma_i(t)$ are some functions of $t$. Let them be step-functions~\cite{PP_2023}
+Non-zero $\gamma_i(t)$ are some functions of $t$. To simplify further analysis, let them be step-functions~\cite{PP_2023}
 \begin{eqnarray}\label{LF}
 \gamma_k(t) = \sum_{j=1}^{K_\gamma} a_{kj} \theta_j(t),\quad  \theta_j(t) =\left\{\begin{array}{ll}
 1, &t_{j-1} < t\le t_j\cr
@@ -294,7 +315,7 @@ Non-zero $\gamma_i(t)$ are some functions of $t$. Let them be step-functions~\ci
 \end{eqnarray}
 Here we split the entire time interval
 $[0,t_{\mathrm{reg}}]$
-in $K_\gamma+1$ intervals of different (in general) lengths assuming that over the first interval $0\le t\le t_{\mathrm{reg}}- \sum_{k=1}^{K_\gamma} \Delta t_k$, $\Delta t_k = t_k - t_{k-1}$.
+in $K_\gamma+1$ intervals of different (in general) lengths assuming that over the first interval $0\le t\le t_{\mathrm{reg}}- \sum_{k=1}^{K_\gamma} \Delta t_k$, $\Delta t_k = t_k - t_{k-1}$, the evolution is governed by the $XXZ$-Hamiltonian without Lindblad terms (i.e., all  $\gamma_i=0$).
 As a simplest variant, let us fix $t_j$ and consider  $a_{kj}$ as control parameters.
 Therefore, the extended receiver with $N^{(ER)}$ nodes has $K_\gamma N^{(ER)}$ free parameters.
 \iffalse
@@ -322,17 +343,18 @@ w^{(k)}_{nm;ij}=\left\{
  -i (H_{ni} - H_{jm}) + \sum_{l=N-N^{(ER)}}^N a_{lk} ((Z_l)_i (Z_l)_j \delta_{ni}\delta_{mj} - \frac{\Gamma_k}{4} \delta_{ni}\delta_{mj},& t_{k-1}<t\le t_k\cr
 1,& {\mbox{otherwise}}\end{array}\right.,
 \end{eqnarray}
-where $\Gamma_k = \sum_{l=N-N^{(ER)}}^N a_{lk}$,   $w^{(k)}$ is constant over the selected time-interval.
- We introduce the matrix $\hat w^{(k)} =\{w^{(k)}_{nm;ij}\}$  where each pair of indexes $(nm)$ and $(ij)$ is treated as a single index.
+where $\Gamma_k = \sum_{l=N-N^{(ER)}}^N a_{lk}$.Thus,   $w^{(k)}$ is constant over the  time-interval $t_{k-1}<t<t_k$.
+ We introduce the matrix $\hat w^{(k)} =\{w^{(k)}_{nm;ij}\}$  where each pair of indexes $(nm)$ and $(ij)$ is treated as a single index. Similarly, each element$\rho_{nm}$is considered as an element of a vector $\vec{\rho}$.
 Then
  \begin{eqnarray}\label{rhoT}
  \vec{\rho}(t) = W^{(k)}(t) \vec{\rho}(t_{k-1}),\;\; W^{(k)}(t)=e^{\hat w^{(k)} t}, \;\; t_{k-1} < t \le t_k.
  \end{eqnarray}
-Here the elements of $\vec{\rho}$ are $\rho_{nm}$, i.e., they are enumerated by the pair of indexes
+%Here the elements of $\vec{\rho}$ are $\rho_{nm}$, i.e., they are enumerated by
+%the pair of indexes
 Thus, $W$ in (\ref{rhonm})  becomes a product of piece-wise constant functions: %$W = W_{K_\gamma}\dots W_1$ and
 \begin{eqnarray}\label{UtK}
 &&
-W(t_{\mathrm{reg}})=  W^{(K_\gamma)}(\Delta t_{K_\gamma})\dots W^{(1)}(\Delta t_1) W^{(0)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) W(0),\quad  \Delta t_j = t_j -t_{j-1},\\\label{W0}
+W(t_{\mathrm{reg}})=  W^{(K_\gamma)}(\Delta t_{K_\gamma})\dots W^{(1)}(\Delta t_1) W^{(0)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) ,\quad  \Delta t_j = t_j -t_{j-1},\\\label{W0}
 &&W^{(0)}_{nm;ij}(t) =\left( e^{-iHt} \right)_{ni}
 \left( e^{iH t} \right)_{jm}.
 \end{eqnarray}
@@ -369,70 +391,52 @@ Below we consider two models allowing to include the Larmour frequencies in a si
 \end{eqnarray}
 
 \subsection{Model 1: Trotterization}
+\subsubsection{General formulae}
 \label{Section:Trot}
 As the first model, we propose the Troterrization method for simulating the evolution using the Trotter-Suzuki approach~\cite{Trotter,Suzuki}.
 {For this model we considet the $\tau$-dependence of  $\gamma_j$ in the form of the  step-functions (\ref{LF})
-and separate evolution under $H$ and under Landblad terms. Thus, we have for the operators $W_j$ in (\ref{UtK}): %see (\ref{rhoT}),
+and separate evolution under $H$ and under Landblad terms. Thus, we have for the operators $W_j$ in (\ref{UtK}) (hereafter $\tilde n$ is the Trottorization number): %see (\ref{rhoT}),
 \begin{eqnarray}\label{Wk}
 &&
-W^{(k)}(\Delta\tau_k) =
-\left(U\Big(\frac{\Delta \tau}{n}\Big) V^{(k)}\Big(\frac{\Delta \tau}{n}\Big)\right)^n ,\\\nonumber
+W^{(k;\tilde n)}(\Delta\tau_k) =
+\left(U\Big(\frac{\Delta \tau}{\tilde n}\Big) V^{(k)}\Big(\frac{\Delta \tau}{\tilde n}\Big)\right)^{\tilde n} ,\\\nonumber
 &&
-W^{(0)}(\tau) =U(\tau),
+W^{(0;\tilde n)}(\tau) =U(\tau),
 \end{eqnarray}
-where
+where the elements of $U$ and $V^{(k)}$ read
 \begin{eqnarray}\label{UV}
 &&
-U_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = \Big(e^{ -i H\frac{\Delta \tau}{n}} \Big)_{ni}\Big(e^{ i H\frac{\Delta \tau}{n}} \Big)_{jm}  ,\\\nonumber
+U_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = \Big(e^{ -i H\frac{\Delta \tau}{\tilde n}} \Big)_{ni}\Big(e^{ i H\frac{\Delta \tau}{\tilde n}} \Big)_{jm}  ,\\\nonumber
 &&
-V^{(k)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = e^{ \Big( \sum_l a_{lk} (Z_l )_i  (Z_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{n}} \delta_{ni}\delta_{mj}.
+V^{(k)}_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = e^{ \Big( \sum_l a_{lk} (Z_l )_i  (Z_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{\tilde n}} \delta_{ni}\delta_{mj},
 \end{eqnarray}
-%see Fig.\ref{Fig:step}a}.
-%\begin{eqnarray}\label{UtK}
-%W^{(0)}(t_{\mathrm{reg}})=  W^{(0)}_{K_\gamma}(\Delta t_{K_\gamma})\dots %W^{(0)}_1(\Delta t_1) W^{(0)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta %t_j\Big) W^{(0)}(0),\quad  \Delta t_j = t_j -t_{j-1}.
-%\end{eqnarray}
-%
-Next, we calculate the partial trace to obtain $\rho^{(R)}$. To this end we split $n\to (n_1 n_R)$, $m\to (n_1 m_R)$, $i\to (i_S 0)$,  $j\to (j_S 0)$
-\begin{eqnarray}
-\rho^{(R)}_{n_Rm_R} =\sum_{n_1} \sum_{i_Sj_S}W_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} \rho^{(S)}_{i_Sj_S}(0) =\sum_{i_Sj_S}W_{(0 n_R)(0m_R);(i_S0)(j_S0)}  \rho^{(S)}_{i_Sj_S}(0) .
-\end{eqnarray}
-Thus,
-\begin{eqnarray}
-T_{n_Rm_R;i_Sj_S} = W_{(0 n_R)(0m_R);(i_S0)(j_S0)} .
-\end{eqnarray}
-The restoring conditions read
-\begin{eqnarray}
-W_{(0 n_R)(0m_R);(i_S0)(j_S0)}=0, \;\;(i_S,j_S)\neq (n_R,m_R) .
-\end{eqnarray}
-In this case
-\begin{eqnarray}
-\lambda_{n_Rm_R} =W_{(0 n_R)(0m_R);(n_R0)(m_R0)}.
-\end{eqnarray}
+and $W^{(0;\tilde n)}$ is the same for any $\tilde n$.
+Notice that dependence on the parameters $a_{lk}$ appears only in $V^{(k)}$.
 
 
 \subsubsection{Restoring the 1-st order coherence matrix}
 
 Now we consider (0,1)-excitation space and write the formulae of Sec.\ref{Section:Trot} for restoring the 1-order coherence matrix. Formulae (\ref{UV}) now get the following form
-\begin{eqnarray}\label{UV1}
+\begin{eqnarray}\label{UV10}
 &&
-U^{(1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = \Big(e^{ -i H^{(0)}\frac{\Delta \tau}{n}} \Big)_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau}{n}} \Big)_{jm}  ,\\\nonumber
+U^{(1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = \Big(e^{ -i H^{(0)}\frac{\Delta \tau}{\tilde n}} \Big)_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau}{\tilde n}} \Big)_{jm}  ,\\\nonumber
 &&
-V^{(k;1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = e^{ \Big( \sum_l a_{lk} (Z^{(0)}_l)_{i}   (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{n}}  \delta_{ni}\delta_{mj}.
+V^{(k;1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = e^{ \Big( \sum_l a_{lk} (Z^{(0)}_l)_{i}   (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{\tilde n}}  \delta_{ni}\delta_{mj}.
 \end{eqnarray}
 We can write the block-structure for $Z_i$:
 \begin{eqnarray}
-Z_i ={\mbox{diag}}(Z_i^{(0)}, Z_i^{(1)},Z_i^{(2)} \dots),
+Z_i ={\mbox{diag}}(Z_i^{(0)}, Z_i^{(1)}),
 \end{eqnarray}
-we need only $Z_i^{(0)}$ and $Z_i^{(1)}$:
+where
 \begin{eqnarray}
 Z_i^{(0)} =\frac{1}{2}, Z_i^{(1)} = \frac{1}{2} {\mbox{diag}}( \underbrace{1,\dots,1}_{i-1}, -1, \underbrace{1,\dots,1}_{N-i}.
 \end{eqnarray}
-Taking into account also (\ref{bH0}), we rewrite (\ref{UV1}) as
+Taking into account that $H_0$ is a scalar, we rewrite (\ref{UV10}) as
 \begin{eqnarray}\label{UV1}
 &&
-U^{(1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = \delta_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau}{n}} \Big)_{jm}= \delta_{ni}\tilde U^{(1)}_{jm},\;\; \tilde U^{(1)}_{jm} = \Big(e^{ i H^{(1)}\frac{\Delta \tau}{n}} \Big)_{jm}  ,\\\nonumber
+U^{(1)}_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = \delta_{ni}\Big(e^{ i (H^{(1)}-H^{(0)})\frac{\Delta \tau}{\tilde n}} \Big)_{jm}= \delta_{ni}\tilde U^{(1)}_{jm},\;\; \tilde U^{(1)}_{jm} = \Big(e^{ i (H^{(1)}-H^{(0)})\frac{\Delta \tau}{\tilde n}} \Big)_{jm}  ,\\\nonumber
 &&
-V^{(k;1)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = e^{ \Big( \sum_l \frac{a_{lk}}{2}    (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{n}}  \delta_{ni}\delta_{mj}  =\delta_{ni} \tilde V^{(k;1)}_{jm},\;\; \tilde V^{(k;1)}_{jm}=e^{ \Big( \sum_l \frac{a_{lk}}{2}    (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big) }\delta_{mj}.
+V^{(k;1)}_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = e^{ \Big( \sum_l \frac{a_{lk}}{2}    (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{\tilde n}}  \delta_{ni}\delta_{mj}  =\delta_{ni} \tilde V^{(k;1)}_{jm},\;\; \tilde V^{(k;1)}_{jm}=e^{ \Big( \sum_l \frac{a_{lk}}{2}    (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big) \frac{\Delta \tau}{\tilde n}}\delta_{mj}.
 \end{eqnarray}
 In other words, $\tilde U$ and $\tilde V$ can be written in the matrix-exponential form
 %
@@ -442,8 +446,8 @@ In other words, $\tilde U$ and $\tilde V$ can be written in the matrix-exponenti
 %\end{eqnarray}
 %where
 \begin{eqnarray}
-\tilde U^{(1)}\Big(\frac{\Delta \tau_j}{n}\Big) = e^{ i H^{(1)}\frac{\Delta \tau_j}{n}},\;\;
-\tilde V^{(1)}_k\Big(\frac{\Delta \tau_j}{n}\Big) = e^{\Big(\sum_l \frac{a_{lk}}{2}    Z^{(1)}_l  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{n}} .
+\tilde U^{(1)}\Big(\frac{\Delta \tau_j}{\tilde n}\Big) = e^{ i (H^{(1)}-H^{(0)})\frac{\Delta \tau_j}{\tilde n}},\;\;
+\tilde V^{(1)}_k\Big(\frac{\Delta \tau_j}{n}\Big) = e^{\Big(\sum_l \frac{a_{lk}}{2}    Z^{(1)}_l  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{\tilde n}} .
 \end{eqnarray}
 %see Fig.\ref{Fig:step}a}.
 %\begin{eqnarray}\label{UtK}
@@ -453,35 +457,36 @@ The number of control parameters equals $N^{(ER)} K_\gamma$.
 %Hereafter we identify {$t_{K_\gamma}\equiv t_{\mathrm{reg}}$} for simplicity.
 Eq.(\ref{Wk}) yields
 \begin{eqnarray}\label{Wk2}
-W^{(k;1)}_{nm;ij}(\Delta\tau_k) =\delta_{ni} \tilde W^{(k;1)}_{jm},\;\;
- \tilde W^{(k;1)}_{jm}=\left(\left(\tilde U^{(1)}\Big(\frac{\Delta \tau}{n}\Big) \tilde V^{(k;1)}\Big(\frac{\Delta \tau}{n}\Big)\right)^n\right)_{jm} ,
+W^{(k;1;\tilde n)}_{nm;ij}(\Delta\tau_k) =\delta_{ni} \tilde W^{(k;1;\tilde n)}_{jm},\;\;
+ \tilde W^{(k;1;\tilde n)}_{jm}=\left(\left(\tilde U^{(1)}\Big(\frac{\Delta \tau}{\tilde n}\Big) \tilde V^{(k;1)}\Big(\frac{\Delta \tau}{\tilde n}\Big)\right)^n\right)_{jm} .
 \end{eqnarray}
-and
+Denote $W$ in (\ref{UtK}) corresponding to 0- and 1-order coherence matrices by $ W^{(0;\tilde n)}$ and  $ W^{(1;\tilde n)}$ respectively.
+Then we can write
 \begin{eqnarray}\label{UtK2}
 &&
-W^{(1)}_{nm;ij} = \delta_{ni}  \tilde W^{(1)}_{jm},\\\nonumber
+ W^{(1;\tilde n)}_{nm;ij} = \delta_{ni}  \tilde W^{(1;\tilde n)}_{jm},\\\nonumber
 &&
- \tilde W^{(1)}(t_{\mathrm{reg}})=  \tilde W^{(K_\gamma;1)}(\Delta t_{K_\gamma})\dots \tilde W^{(1;1)} (\Delta t_1) \tilde W^{(0;1)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) \tilde W^{(1)}(0),\quad  \Delta t_j = t_j -t_{j-1},\\\nonumber
+ \tilde W^{(1;\tilde n)}(t_{\mathrm{reg}})=  \tilde W^{(K_\gamma;1;\tilde n)}(\Delta t_{K_\gamma})\dots \tilde W^{(1;1;\tilde n)} (\Delta t_1) \tilde W^{(0;1;\tilde n)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) ,\quad  \Delta t_j = t_j -t_{j-1},\\\nonumber
 &&
- \tilde W^{(0;1)}(t)= \tilde U^{(1)}(t),\;\; \tilde W^{(1)}(0) = \tilde U^{(1)}(0)
+ \tilde W^{(0;1;\tilde n)}(t)= \tilde U^{(1)}(t).
 \end{eqnarray}
 In this case
 \begin{eqnarray}
 \rho^{(1)}_{nm}(\tau_{\mathrm{reg}}) = \sum_{ij} \delta_{ni}\rho^{(1)}_{ij}(0) \tilde W^{(1)}_{jm}(\tau_{\mathrm{reg}}) ,
 \end{eqnarray}
-Therefore, using the partial trace to obtain $\rho^{(R)}$, split $n\to (n_1 n_R)$, $m\to (n_1 m_R)$, $i\to (i_S 0)$,  $j\to (j_S 0)$
+Therefore, using the partial trace to obtain $\rho^{(R)}$ and splitting subscripts according to (\ref{SR}), we obtain
 \begin{eqnarray}
-\rho^{(R;1)}_{0m_R} =\sum_{n_1} \sum_{i_Sj_S} \delta_{n_10;i_S0}\rho^{(S;1)}_{i_Sj_S}(0) \tilde W^{(1)}_{j_S0;n_1m_R} =\sum_{j_S}\rho^{(S;1)}_{0j_S}(0) \tilde W^{(1)}_{j_S0;0m_R} .
+\rho^{(R;1)}_{0m_R} =\sum_{n_1} \sum_{i_Sj_S} \delta_{n_10;i_S0}\rho^{(S;1)}_{i_Sj_S}(0) \tilde W^{(1)}_{j_S0;n_1m_R} =\sum_{j_S}\rho^{(S;1)}_{0j_S}(0) \tilde W^{(1)}_{j_S0;0m_R},\;\; |m_R|=1 .
 \end{eqnarray}
 Thus,
 \begin{eqnarray}
 T^{(1)}_{0m_R;0j_S} = \tilde W^{(1)}_{j_S0;0m_R}.
 \end{eqnarray}
-The restoring conditions read
+The restoring conditions (\ref{restor1}) read
 \begin{eqnarray}
 \tilde W^{(1)}_{j_S0;0m_R}=0, \;\;j_S\neq m_R .
 \end{eqnarray}
-In this case
+In this case (\ref{lambda1}) yields
 \begin{eqnarray}
 \lambda^{(1)}_{0m_R} =\tilde W^{(1)}_{m_R0;0m_R}.
 \end{eqnarray}
@@ -494,38 +499,38 @@ All formulae conicide with formulae of Sec.\ref{Section:Trot} up to replacing $H
 Formula (\ref{Wk}) now reads:
 \begin{eqnarray}\label{Wk0}
 &&
-W^{(k;0)}(\Delta\tau_k) =
-\left(U^{(0)}\Big(\frac{\Delta \tau}{n}\Big) V^{(k;0)}\Big(\frac{\Delta \tau}{n}\Big)\right)^n ,\\\nonumber
+W^{(k;0;\tilde n)}(\Delta\tau_k) =
+\left(U^{(0)}\Big(\frac{\Delta \tau}{\tilde n}\Big) V^{(k;0)}\Big(\frac{\Delta \tau}{\tilde n}\Big)\right)^{\tilde n} ,\\\nonumber
 &&
-W^{(0;0)}(\tau) =U^{(0)}(\tau),
+W^{(0;0;\tilde n)}(\tau) =U^{(0)}(\tau),
 \end{eqnarray}
 where
 \begin{eqnarray}\label{UV0}
 &&
-U^{(0)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = \Big(e^{ -i H^{(1)}\frac{\Delta \tau}{n}} \Big)_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau}{n}} \Big)_{jm}  ,\\\nonumber
+U^{(0)}_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = \Big(e^{ -i H^{(1)}\frac{\Delta \tau}{\tilde n}} \Big)_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau}{\tilde n}} \Big)_{jm}  ,\\\nonumber
 &&
-V^{(k;0)}_{nm;ij}\Big(\frac{\Delta \tau}{n}\Big) = e^{ \Big( \sum_l a_{lk} (Z^{(1)}_l )_i  (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{n}} \delta_{ni}\delta_{mj}.
+V^{(k;0)}_{nm;ij}\Big(\frac{\Delta \tau}{\tilde n}\Big) = e^{ \Big( \sum_l a_{lk} (Z^{(1)}_l )_i  (Z^{(1)}_l)_{j}  +\frac{\Gamma_k}{4}\Big)    \frac{\Delta \tau}{\tilde n}} \delta_{ni}\delta_{mj}.
 \end{eqnarray}
 For the density matrix $\rho^{(R)}$ we have
 \begin{eqnarray}
-\rho^{(R;0)}_{n_Rm_R} =\sum_{n_1} \sum_{i_Sj_S}W^{(0)}_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} \rho^{(S;0)}_{i_Sj_S}(0) =\sum_{i_Sj_S}W^{(0)}_{(0 n_R)(0m_R);(i_S0)(j_S0)}  \rho^{(S;0)}_{i_Sj_S}(0) .
+\rho^{(R;0)}_{n_Rm_R} =\sum_{n_1} \sum_{i_Sj_S}W^{(0;\tilde n)}_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} \rho^{(S;0)}_{i_Sj_S}(0) =\sum_{i_Sj_S}W^{(0;\tilde n)}_{(0 n_R)(0m_R);(i_S0)(j_S0)}  \rho^{(S;0)}_{i_Sj_S}(0) .
 \end{eqnarray}
 Thus,
 \begin{eqnarray}
-T^{(0)}_{n_Rm_R;i_Sj_S} = W^{(0)}_{(0 n_R)(0m_R);(i_S0)(j_S0)} .
+T^{(0;\tilde n)}_{n_Rm_R;i_Sj_S} = W^{(0;\tilde n)}_{(0 n_R)(0m_R);(i_S0)(j_S0)} .
 \end{eqnarray}
-The restoring conditions read
+The restoring conditions (\ref{restor1} read
 \begin{eqnarray}\label{restoring}
-W^{(0)}_{(0 n_R)(0m_R);(i_S0)(j_S0)}=0, \;\;(i_S,j_S)\neq (n_R,m_R) .
+W^{(0;\tilde n)}_{(0 n_R)(0m_R);(i_S0)(j_S0)}=0, \;\;(i_S,j_S)\neq (n_R,m_R) .
 \end{eqnarray}
-In this case
+In this case, \ref{lambda1}) yields
 \begin{eqnarray}\label{lambda}
-\lambda^{(0)}_{n_Rm_R} =W^{(0)}_{(0 n_R)(0m_R);(n_R0)(m_R0)}.
+\lambda^{(0;\tilde n)}_{n_Rm_R} =W^{(0;\tilde n)}_{(0 n_R)(0m_R);(n_R0)(m_R0)},\;\; n_R\neq m_R.
 \end{eqnarray}
 
 \subsubsection{Numerical simulations}
 
-{\bf It is enough to take 4 intervals (four pairs of parameters $a_{jk}$, $j=N,N-1$, $k=1,2,3,4$) for the case of 2-node sender/receiver.}
+{\bf It is enough to take 4 intervals (four parameters $a_{jk}$, $j=N$, $k=1,2,3,4$) for the case of 2-node sender/receiver.}
 
 \iffalse
 {\bf END   END  END  END  END  END}
@@ -585,48 +590,23 @@ each $\Delta \tau$ into 2 subintervals,
 \begin{eqnarray}\label{subint}
 \Delta \tau= \Delta \tau^{(1)}+ \Delta \tau^{(2)}.
 \end{eqnarray}
-\iffalse
-so that
-\begin{eqnarray}\label{HHj}
-H_j=\left\{ \begin{array}{ll}
-H_0, & \tau \in \Delta\tau^{(1)}\cr
-H_0 + \Omega_j, & \tau \in \Delta\tau^{(2)}
-\end{array}
-\right.
-\end{eqnarray}
-\fi
-so that $\gamma_j=0$ over $\Delta\tau^{(1)}$.
+so that $\gamma_j=0$ over $\Delta\tau^{(2)}$.
 {Thus, for this model,  we consider the $\tau$-dependence of the Landblad parameters $\gamma_j$  in the pulse form. % shown in Fig.\ref{Fig:step}b.}
 We require
 \begin{eqnarray}\label{avar}
 &&
-\min_{i,j} a_{ij} \gg \max_{i,j} D_{ij}, \\\nonumber
+\min_{i,j} a_{ij} \gg \max_{i,j} D_{ij} \;\;\;{\mbox{over}}\;\;\; \Delta \tau^{(1)}, \\\nonumber
 &&\max_{i, j}a_{ij} \Delta \tau^{(1)}\sim \max_{ij}D_{ij} \Delta \tau^{(2)},
 \end{eqnarray}
-so that
-$$
-\frac{\|\gamma_j\|}{D_{12}} \Delta\tau^{(1)} \sim \frac{\|H_0\|}{D_{12}} \Delta\tau^{(2)}  ,
-$$
-where $\|\cdot\|$ is some matrix norm. In other words,  large $\|\gamma_j\|$s act over the short time interval. This means that the Landblad term dominates  over $H$ on the interval
+%so that
+%$$
+%\frac{\|\gamma_j\|}{D_{12}} \Delta\tau^{(1)} \sim \frac{\|H_0\|}{D_{12}} %\Delta\tau^{(2)}  ,
+%$$
+%where $\|\cdot\|$ is some matrix norm. In other words,  large $\|\gamma_j\|$s act
+%over the short time interval.
+This means that the Landblad term dominates  over $H$ on the interval
 $\Delta\tau^{(1)}$.
-% (see Eq.~(\ref{VV})).
-\iffalse
-Therefore we can approximate Hamiltonian~(\ref{HHj}) as
-\begin{eqnarray}\label{HHj2}
-H_j\approx \left\{ \begin{array}{ll}
-H_0, & \tau \in \Delta\tau^{(2)}\cr
-\Omega_j, & \tau \in \Delta\tau^{(1)}
-\end{array}
-\right.
-\end{eqnarray}
-\fi
-and we can write the approximate evolution operator $W^{(\alpha)}(\Delta \tau)$ as:
-\iffalse
-\begin{eqnarray}\label{Vj}
-U_j(\Delta \tau)=    e^{-i \frac{H_0}{D_{12}} \Delta\tau^{(1)}}  e^{-i \frac{H_0+\Omega_j}{D_{12}} \Delta\tau^{(2)}} \approx
-  e^{-i \frac{H_0}{D_{12}} \Delta\tau^{(1)}}e^{-i \frac{\Omega_j}{D_{12}} \Delta\tau^{(2)}}.
-\end{eqnarray}
-\fi
+and we can write the approximate evolution operator $W^{(k)}(\Delta \tau)$ as:
 \begin{eqnarray}\label{Walpha2}
 W^{(k)}_{nm;ij}\Big({\Delta \tau}\Big)  =   U_{nm;ij}(\Delta\tau^{(2)})V^{(k)}_{ij}       (\Delta\tau^{(1)}).
 \end{eqnarray}

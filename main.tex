@@ -279,7 +279,7 @@ W_j(t) ,& t_{j-1} < t\le t_j\cr
 \end{eqnarray}
 Thus, $W = W_{K_\gamma}\dots W_1$ and
 \begin{eqnarray}\label{UtK}
-W(t_{\mathrm{reg}})=  W_{K_\gamma}(\Delta t_{K_\gamma})\dots W_1(\Delta t_1) W\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big),\quad  \Delta t_j = t_j -t_{j-1}.
+W(t_{\mathrm{reg}})=  W_{K_\gamma}(\Delta t_{K_\gamma})\dots W_1(\Delta t_1) W\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) W(0),\quad  \Delta t_j = t_j -t_{j-1}.
 \end{eqnarray}
 The number of control parameters equals $N^{(ER)} K_\gamma$.
 %Hereafter we identify {$t_{K_\gamma}\equiv t_{\mathrm{reg}}$} for simplicity.
@@ -323,6 +323,21 @@ $[0,t_{\mathrm{reg}}]$
 in $K_\gamma$ intervals of different (in general) lengths.
 As a simplest variant, let us fix $t_j$ and consider  $a_{kj}$ as control parameters.
 Therefore, the extended receiver with $N^{(ER)}$ nodes has $K_\gamma(N^{(ER)}-1)$ free parameters.
+
+We can write (\ref{rho}) as
+\begin{eqnarray}
+\label{rhonm}
+&&
+\partial_t\rho_{nm}(t) = \sum_{ij} \tilde T^{(k)}_{nm;ij}\rho_{ij}(t), \;\; t_{k-1} < t \le t_k,\\\nonumber
+&&
+\tilde T^{(k)}_{nm;ij}= -i (H_{ni} - H_{jm}) + \sum_{l=N-N^{(ER)}}^N a_{lk} ((Z_l)_i (Z_l)_j \delta_{ni}\delta_{mj} - \frac{1}{4} \delta_{ni}\delta_{mj}.
+\end{eqnarray}
+ Introduce the matrix $\hat T^{(k)} =\{\tilde T^{(k)}_{nm;ij}\}$  where each pair ofindexes $(nm)$ and $(ij)}$ is treated as a single index.
+ Then
+ \begin{eqnarray}\label{rhoT}
+ \vec{\rho}(t) = e^{\hat T^{(k)} t}\vec{\rho}(0),  \;\; t_{k-1} < t \le t_k.
+ \end{eqnarray}
+
 We can write the block-structure for $Z_i$:
 \begin{eqnarray}
 Z_i ={\mbox{diag}}(Z_i^{(0)}, Z_i^{(1)},Z_i^{(2)} \dots),
@@ -340,12 +355,23 @@ For 1-order coherence matrices $\rho^{(0)}$ and $\rho^{(1)}$, eq.(\ref{rho}) rea
 Therefore,
 \begin{eqnarray}
 &&\rho^{(1)}_t(t) =  \rho^{(1)}_t(0)  W,\;\;\; W=\prod_{j} \exp\Big( i H^{(1)}\Delta \tau_j + L^{(1)}_j \Delta \tau_j  \Big), \\\nonumber
-&&L^{(1)}_j=  \frac{1}{2}   \sum_{k=N-N^{(ER)}}^Na_{jk}Z^{(1)}_{k}
--\frac{\Gamma_j}{4},\;\;\Gamma_j=\sum_{k=1}^N a_{jk}.
+&&L^{(1)}_j=  \frac{1}{2}   \sum_{k=N-N^{(ER)}}^N a_{kj}Z^{(1)}_{k}
+-\frac{\Gamma_j}{4},\;\;\Gamma_j=\sum_{k=N-N^{(ER)}}^N a_{kj}.
 \end{eqnarray}
 
+The 0-excitation block of $\rho^{(0)}$ does not evolve: $\partial_t \rho^{(0)}_{00}(t)=0$,
+while for the 1-excitation block we have from (\ref{rhonm}):
+\begin{eqnarray}
+\label{rhonm0}
+&&
+\partial_t\rho^{(0)}_{nm}(t) = \sum_{ij} \tilde T^{(k;0)}_{nm;ij}\rho^{(0)}_{ij}(t), \;\; t_{k-1} < t \le t_k,\\\nonumber
+&&
+\tilde T^{(k;0)}_{nm;ij}= -i (H^{(1)}_{ni} - H^{(1)}_{jm}) + \sum_{l=N-N^{(ER)}}^N a_{lk} ((Z^{(1)}_l)_i (Z^{(1)}_l)_j \delta_{ni}\delta_{mj} - \frac{1}{4} \delta_{ni}\delta_{mj}.
+\end{eqnarray}
+
+
 Although  formally  implementing  the evolution with  piece-constant $\gamma_j$  (\ref{LF}) is very simple,
-its simulation faces the problem of  Hamiltonian diagonalization because of the free parameters $a_{kj}$ which can not be fixed until solving system (\ref{P1}) {and therefore must be treated symbolically}. Therefore we are forced to turn to the approximate evolution which would simplify the dependence on the free parameters.
+its simulation faces the problem of  Hamiltonian diagonalization because of the free parameters $a_{kj}$ which can not be fixed until solving system (\ref{P1}) {and therefore must be treated symbolically}. This fact  forces us to turn to the approximate evolution which would simplify the dependence on the free parameters.
 Below we consider two models allowing to include the Larmour frequencies in a simpler way. We use dimensionless time $\tau = D_{12} t$ and equal intervals
 \begin{eqnarray}\label{dtau}
 \Delta\tau = \tau_j-\tau_{j-1} ={ \frac{\tau_{\mathrm{reg}}}{K_\gamma}.}
@@ -355,19 +381,19 @@ Below we consider two models allowing to include the Larmour frequencies in a si
 \label{Section:Trot}
 As the first model, we propose the Troterrization method for simulating the evolution using the Trotter-Suzuki approach~\cite{Trotter,Suzuki}.
 {For this model we considet the $\tau$-dependence of  $\gamma_j$ in the form of the  step-functions (\ref{LF})
-and consider separate evolution under $H$ and under Landblad term, i.e.
+and consider separate evolution under $H$ and under Landblad terms, i.e., for the 1-order coherence matrix $\rho^{(1)}$ we have:
 \begin{eqnarray}
-W_j(\Delta\tau_j) = \exp\Big( i H^{(1)}\Delta \tau_j + L^{(1)}_j \Delta \tau_j  \Big)W(0) = \prod_k
+W^{(1)}_j(\Delta\tau_j) = \exp\Big( i H^{(1)}\Delta \tau_j + L^{(1)}_j \Delta \tau_j  \Big)W(0) = \prod_k
 \left(U\Big(\frac{\Delta \tau}{n}\Big) V_k\Big(\frac{\Delta \tau}{n}\Big)\right)^n W(0),
 \end{eqnarray}
 where
 \begin{eqnarray}
-U\Big(\frac{\Delta \tau_j}{n}\Big) = e^{ i H^{(1)}\frac{\Delta \tau_j}{n}},\;\;
-V_k\Big(\frac{\Delta \tau_j}{n}\Big) = e^{  L^{(1)}_k \frac{\Delta \tau_j}{n}} .
+U^{(1)}\Big(\frac{\Delta \tau_j}{n}\Big) = e^{ i H^{(1)}\frac{\Delta \tau_j}{n}},\;\;
+V^{(1)}_k\Big(\frac{\Delta \tau_j}{n}\Big) = e^{  L^{(1)}_k \frac{\Delta \tau_j}{n}} .
 \end{eqnarray}
 %see Fig.\ref{Fig:step}a}.
 \begin{eqnarray}\label{UtK}
-W(t_{\mathrm{reg}})=  W_{K_\gamma}(\Delta t_{K_\gamma})\dots W_1(\Delta t_1) W\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) W(0),\quad  \Delta t_j = t_j -t_{j-1}.
+W^{(1)}(t_{\mathrm{reg}})=  W^{(1)}_{K_\gamma}(\Delta t_{K_\gamma})\dots W^{(1)}_1(\Delta t_1) W^{(1)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) W^{(1)}(0),\quad  \Delta t_j = t_j -t_{j-1}.
 \end{eqnarray}
 The number of control parameters equals $N^{(ER)} K_\gamma$.
 %Hereafter we identify {$t_{K_\gamma}\equiv t_{\mathrm{reg}}$} for simplicity.
@@ -376,9 +402,9 @@ In this case
 \begin{eqnarray}
 \rho^{(1)}_{nm} = \sum_{ij} \delta_{ni}\rho^{(1)}_{ij}(0) W_{jm},
 \end{eqnarray}
-Therefore, using the partial trace to obtain $\rho^{(R)}$, split $n\to (n_1 n_R)$, $m\to (n_1 m_R)$, $j\to (j_S 0)$
+Therefore, using the partial trace to obtain $\rho^{(R)}$, split $n\to (n_1 n_R)$, $m\to (n_1 m_R)$, $i\to (i_S 0)$,  $j\to (j_S 0)$
 \begin{eqnarray}
-\rho^{(R;1)}_{0m_R} =\sum_{n_1} \sum_{ij_S} \delta_{n_10;i_S0}\rho^{(S;1)}_{i_Sj_S}(0) W_{j_S0;n_1m_R} =\sum_{j_S}\rho^{(S;1)}_{0j_S}(0) W_{j_S0;0m_R} .
+\rho^{(R;1)}_{0m_R} =\sum_{n_1} \sum_{i_Sj_S} \delta_{n_10;i_S0}\rho^{(S;1)}_{i_Sj_S}(0) W_{j_S0;n_1m_R} =\sum_{j_S}\rho^{(S;1)}_{0j_S}(0) W_{j_S0;0m_R} .
 \end{eqnarray}
 Thus,
 \begin{eqnarray}
@@ -386,12 +412,49 @@ T_{0m_R;0j_S} = W_{j_S0;0m_R}.
 \end{eqnarray}
 The restoring conditions read
 \begin{eqnarray}
-W_{j_S0;0m_R}, \;\;j_S\neq m_R .
+W_{j_S0;0m_R}=0, \;\;j_S\neq m_R .
 \end{eqnarray}
 In this case
 \begin{eqnarray}
 \lambda_{0m_R} =W_{m_R0;0m_R}.
 \end{eqnarray}
+
+For  the 0-order coherence matrix we have for the operator $W= e^{\hat T t}$, see (\ref{rhoT}),
+\begin{eqnarray}
+W^{(0)}_j{(\Delta\tau_j) =e^{\hat T^{(k)} t} W^{(0)}(0) =
+\left(U^{(0)}\Big(\frac{\Delta \tau}{n}\Big) V^{(0)}_k\Big(\frac{\Delta \tau}{n}\Big)\right)^n W^{(0)}(0),
+\end{eqnarray}
+where
+\begin{eqnarray}
+U^{(0)}_{nm;ij}\Big(\frac{\Delta \tau_j}{n}\Big) = \Big(e^{ -i H^{(1)}\frac{\Delta \tau_j}{n}} \Big)_{ni}\Big(e^{ i H^{(1)}\frac{\Delta \tau_j}{n}} \Big)_{jm}  ,\;\;
+V^{(0;k)}_{nm;ij}\Big(\frac{\Delta \tau_j}{n}\Big) = e^{  L^{(1;k)}_{i}  L^{(1;k)}_{j}  \frac{\Delta \tau_j}{n}}  \delta_{ni}\delta_{mj}.
+\end{eqnarray}
+%see Fig.\ref{Fig:step}a}.
+\begin{eqnarray}\label{UtK}
+W^{(0)}(t_{\mathrm{reg}})=  W^{(0)}_{K_\gamma}(\Delta t_{K_\gamma})\dots W^{(0)}_1(\Delta t_1) W^{(0)}\Big(t_{reg} - \sum_{j=1}^{K_\gamma} \Delta t_j\Big) W^{(0)}(0),\quad  \Delta t_j = t_j -t_{j-1}.
+\end{eqnarray}
+
+
+Therefore, using the partial trace to obtain $\rho^{(R)}$, split $n\to (n_1 n_R)$, $m\to (n_1 m_R)$, $i\to (i_S 0)$,  $j\to (j_S 0)$
+\begin{eqnarray}
+\rho^{(R;0)}_{n_Rm_R} =\sum_{n_1} \sum_{i_Sj_S} \delta_{n_10;i_S0}W_{(n_1 n_R)(n_1m_R);(i_S0)(j_S0)} \rho^{(S;1)}_{i_Sj_S}(0) =\sum_{i_Sj_S}W_{(0 n_R)(0m_R);(i_S0)(j_S0)}  \rho^{(S;1)}_{i_Sj_S}(0) .
+\end{eqnarray}
+Thus,
+\begin{eqnarray}
+T_{n_Rm_R;i_Sj_S} = W_{(0 n_R)(0m_R);(i_S0)(j_S0)} .
+\end{eqnarray}
+The restoring conditions read
+\begin{eqnarray}
+W_{(0 n_R)(0m_R);(i_S0)(j_S0)}=0, \;\;(i_S,j_S\)neq (n_R,m_R) .
+\end{eqnarray}
+In this case
+\begin{eqnarray}
+\lambda_{n_Rm_R} =W_{(0 n_R)(0m_R);(n_R0)(m_R0)}.
+\end{eqnarray}
+
+
+
+
 
 
 \subsection{0-order coherence}

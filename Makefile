@@ -2,7 +2,7 @@
 
 .PHONY: clean
 clean:
-	git clean -xf *converted-to.pdf *.blg *.log
+	git clean -xf *converted-to.pdf *.blg *.log *.aux mainNotes.bib
 
 .PHONY: compress
 compress: clean

@@ -10,7 +10,80 @@ from quanty.task.transfer_ import FitTransmissionTimeTask
 from orrvciwe import TransferProblem, TransferTask, dephasing, dephasing_operator
 
 
-class TestTransferTask(unittest.TestCase):
+class TestTransferN6S2E1Task(unittest.TestCase):
+    def setUp(self):
+        excitations = 1
+        length = 6
+        n_sender = 2
+        geometry = UniformChain()
+        model = Homogeneous(geometry)  # All with all !
+        hamiltonian = XXZ(model)
+        self.problem = TransferProblem.init_classic(
+            hamiltonian,
+            length=length,
+            n_sender=n_sender,
+            excitations=n_sender if excitations is None else excitations,
+            n_ancillas=length - n_sender,  # in quanty ancillas means not a reciever
+        )
+        self.transmission_time = 20
+        self.tuning_time = 10
+
+    def test_coeffs(self):
+        features_raw = """
+            {Gam[6][1] -> 0.7467966572771598, Gam[6][2] -> -0.05452340990634395,
+             Gam[6][3] -> -0.0016970523999852466, Gam[6][4] -> 1.6616712163587286,
+             Gam[5][1] -> 0.7841842353957827, Gam[5][2] -> 0.4675460310633446,
+             Gam[5][3] -> 0.7936298905913943, Gam[5][4] -> 1.8475007474774925,
+             Gam[4][1] -> 1.519445304120249, Gam[4][2] -> 1.409607025097288,
+             Gam[4][3] -> 1.1637673536099047, Gam[4][4] -> 0.2726030636535845,
+             Gam[3][1] -> 0.1111924085973801, Gam[3][2] -> 0.16046209900820732,
+             Gam[3][3] -> 0.7948706012383544, Gam[3][4] -> 1.0471904022349234}
+        """
+
+        import re
+
+        features_processed = [
+            re.search(r"\w+\[(\d+)\]\[(\d+)\] -> ([-\.\d]+)", v.strip()).groups()
+            for v in features_raw.split(",")
+        ]
+
+        n_steps = max(int(j) for _, j, _ in features_processed)
+
+        features = [
+            [
+                0,
+            ]
+            * self.problem.length
+            for _ in range(n_steps)
+        ]
+        for i_spin, i_time, value in features_processed:
+            features[int(i_time) - 1][int(i_spin) - 1] = abs(float(value))
+
+        features = tuple(tuple(row) for row in features)
+
+        task = TransferTask(
+            problem=self.problem,
+            transmission_time=self.transmission_time - self.tuning_time,
+            tuning_time=self.tuning_time,
+            features=features,
+            nt_per_step=4,
+        )
+        impacts = task.receiver_state_impacts(use_cache=False)
+        desired_coefs = (
+            (0.000625758, 0.00560245, 0, 0),
+            (0, 0, 0.0205902, 0.0141093),
+        )
+        for (v, impact), desired in zip(impacts.items(), desired_coefs):
+            with self.subTest(v):
+                left, right = impact[0, 1:]
+                np.testing.assert_allclose(
+                    [left.real, left.imag, right.real, right.imag],
+                    desired,
+                    atol=1e-7,
+                )
+
+
+class TestTransferN5S2E1Task(unittest.TestCase):
     def setUp(self):
         length = 5
         n_sender = 2
@@ -37,7 +110,7 @@ class TestTransferTask(unittest.TestCase):
         )
         impacts = task.receiver_state_impacts(use_cache=False)
         (r01, _), (r02, _) = sorted(
-            [(k, v) for k, v in self.problem.sender_params.items()], key=lambda x: x[-1]
+            [(k, v) for k, v in task.problem.sender_params.items()], key=lambda x: x[-1]
         )
         r01_coeff_ = impacts[r01][0, 1:]
         r02_coeff_ = impacts[r02][0, 1:]

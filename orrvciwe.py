@@ -15,6 +15,11 @@ from quanty.task.transfer_ import TransferZQCPerfectlyTask, as_real_imag
 
 
 class TransferProblem(TransferZQCAlongChain):
+    @classmethod
+    def init_classic(cls, hamiltonian, length: int, n_sender: int, **kwargs):
+        n_ancillas = length - n_sender  # in quanty ancillas means not a reciever
+        return super().init_classic(hamiltonian, length, n_sender, n_ancillas, **kwargs)
+
     def coherence_matrix(self):
         symbols, m = coherence_matrix(order=1, basis=self.sender_basis)
         r01 = sp.S("r01")

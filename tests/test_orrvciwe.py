@@ -23,7 +23,6 @@ class TestTransferN6S2E1Task(unittest.TestCase):
             length=length,
             n_sender=n_sender,
             excitations=n_sender if excitations is None else excitations,
-            n_ancillas=length - n_sender,  # in quanty ancillas means not a reciever
         )
         self.transmission_time = 20
         self.tuning_time = 10
@@ -97,7 +96,6 @@ class TestTransferN5S2E1Task(unittest.TestCase):
             length=length,
             n_sender=n_sender,
             excitations=n_sender if excitations is None else excitations,
-            n_ancillas=length - n_sender,  # in quanty ancillas means not a reciever
         )
         self.transmission_time = 4.56617
 

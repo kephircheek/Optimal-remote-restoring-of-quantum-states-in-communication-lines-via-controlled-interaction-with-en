@@ -47,7 +47,7 @@ def dephasing_values(gammas, ex):
         _values = np.diag(sz_).reshape(-1, 1)
         _values = _values @ _values.reshape(1, -1)
         _values -= 0.25
-        _values *= gamma
+        _values = _values * gamma
         values += _values
     return values
 
@@ -55,7 +55,10 @@ def dephasing_values(gammas, ex):
 @functools.cache
 def dephasing_operator(t, gammas, ex):
     values = dephasing_values(gammas, ex=ex)
-    return np.exp(values * t)
+    exp = np.exp
+    if any(isinstance(g, sp.Symbol) for g in gammas):
+        exp = np.vectorize(sp.exp)
+    return exp(values * t)
 
 
 def dephasing(rho, t, gammas, ex=None):

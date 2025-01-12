@@ -11,7 +11,7 @@ from quanty import matrix
 from quanty.base import sz
 from quanty.problem.transfer import TransferZQCAlongChain
 from quanty.state.coherence import coherence_matrix
-from quanty.task.transfer_ import TransferZQCPerfectlyTask
+from quanty.task.transfer_ import TransferZQCPerfectlyTask, as_real_imag
 
 
 class TransferProblem(TransferZQCAlongChain):
@@ -86,7 +86,14 @@ class TransferTask(TransferZQCPerfectlyTask):
 
     def _residuals(self, var, impact):
         k, m = self.problem.sender_params[var]
-        return tuple(np.abs(impact[i, j]) for i, j in self.problem.sender_params.values() if (i, j) != (k, m))
+        return sum(
+            (
+                as_real_imag(impact[i, j])
+                for i, j in self.problem.sender_params.values()
+                if (i, j) != (k, m)
+            ),
+            tuple(),
+        )
 
     def perfect_transferred_state_residuals(self, use_cache=True) -> np.ndarray:
         return np.array(

@@ -66,18 +66,18 @@ def dephasing(rho, t, gammas, ex=None):
 @dataclass(frozen=True)
 class TransferTask(TransferZQCPerfectlyTask):
     tuning_time: int = 0
+    nt_per_step: int = 3
 
     def tune(self, state):
         # return state
-        nt_per_peak = 3
-        nt = nt_per_peak * len(self.features)
+        nt = self.nt_per_step * len(self.features)
         tt = self.tuning_time / nt
         u = self.problem.hamiltonian.U(self.problem.length, tt, ex=self.problem.ex)
         gammas = iter(self.features)
         ul = dephasing_operator(tt, next(gammas), ex=self.problem.ex)
         t = 0
         for it in range(nt):
-            if it != 0 and it % nt_per_peak == 0:
+            if it != 0 and it % self.nt_per_step == 0:
                 ul = dephasing_operator(tt, next(gammas), ex=self.problem.ex)
             state = state * ul
             state = u @ state @ u.conjugate().transpose()

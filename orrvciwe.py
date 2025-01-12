@@ -108,3 +108,14 @@ class TransferTask(TransferZQCPerfectlyTask):
                 tuple(),
             )
         )
+
+    def perfect_transferred_state_quality(self, use_cache=True) -> np.ndarray:
+        return np.array(
+            sum(
+                (
+                    as_real_imag(impact[self.problem.sender_params[v]])
+                    for v, impact in self.receiver_state_impacts(use_cache=use_cache).items()
+                ),
+                tuple(),
+            )
+        )

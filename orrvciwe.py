@@ -3,10 +3,12 @@ Optimal remote restoring via controlled interaction with environment.
 
 """
 import functools
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 import sympy as sp
+import timeti
+from scipy import optimize
 from quanty import matrix
 from quanty.base import sz
 from quanty.problem.transfer import TransferZQCAlongChain
@@ -124,3 +126,91 @@ class TransferTask(TransferZQCPerfectlyTask):
                 tuple(),
             )
         )
+
+
+@dataclass(frozen=True)
+class FitTransferTask:
+    task: TransferTask
+    optimization_kwargs: dict = None
+    regularization_importance: float = 1e-6
+    polish: bool = True
+    polish_kwargs: dict = None
+
+    @property
+    def n_controlled_nodes(self):
+        return len(self.task.features[0])
+
+    def reshape_features(self, x):
+        features = x.reshape(-1, self.n_controlled_nodes)
+        n_steps = features.shape[0]
+        if features.shape[1] != self.task.problem.length:
+            features = np.hstack(
+                (np.zeros((n_steps, self.task.problem.length - self.n_controlled_nodes)), features)
+            )
+        features = tuple([tuple(row) for row in features])
+        return features
+
+    def residuals(self, x):
+        features = self.reshape_features(x)
+        task = replace(self.task, features=features)
+        r = task.perfect_transferred_state_residuals(use_cache=False)
+        return r
+
+    def residuals_and_quality(self, x):
+        features = self.reshape_features(x)
+        task = replace(self.task, features=features)
+        q = self.regularization_importance * np.abs(task.perfect_transferred_state_quality())
+        r = task.perfect_transferred_state_residuals(use_cache=False)
+        return np.hstack((r, 1 - q))
+
+    def run(self):
+        sw = timeti.Stopwatch()
+        optimization_kwargs = (
+            dict() if self.optimization_kwargs is None else self.optimization_kwargs
+        )
+        optimization_kwargs.setdefault("bounds", (0, 1))
+        optimization_kwargs.setdefault("xtol", 1e-10)
+        optimization_kwargs.setdefault("ftol", 1e-15)
+        optimization_kwargs.setdefault("gtol", 1e-12)
+        if self.regularization_importance is None:
+            fun = self.residuals
+        else:
+            fun = self.residuals_and_quality
+        x0 = np.array(self.task.features).flatten()
+        optimization_res = optimize.least_squares(fun, x0, **optimization_kwargs)
+
+        features = self.reshape_features(optimization_res.x)
+
+        if self.polish and self.regularization_importance is None:
+            import warnings
+
+            warnings.warn("Warning: 'regularization_importance' is None but 'polish' is True")
+
+        polish_res = None
+        if self.polish:
+            x0 = optimization_res.x
+            polish_kwargs = dict() if self.polish_kwargs is None else self.polish_kwargs
+            polish_kwargs.setdefault("bounds", (0, 1))
+            polish_kwargs.setdefault("xtol", 1e-10)
+            polish_kwargs.setdefault("ftol", 1e-15)
+            polish_kwargs.setdefault("gtol", 1e-12)
+            polish_res = optimize.least_squares(self.residuals, x0, **polish_kwargs)
+            features = self.reshape_features(polish_res.x)
+
+        execution_time = sw.timestamp
+        return FitTransferTaskResult(
+            task=self,
+            features=features,
+            optimization_result=optimization_res,
+            polish_result=polish_res,
+            execution_time=execution_time,
+        )
+
+
+@dataclass(frozen=True)
+class FitTransferTaskResult:
+    task: FitTransferTask
+    features: tuple[tuple[float, ...], ...]
+    optimization_result: optimize.OptimizeResult
+    polish_result: optimize.OptimizeResult = None
+    execution_time: float = None

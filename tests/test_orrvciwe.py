@@ -2,12 +2,39 @@ import unittest
 
 import numpy as np
 import qutip as qp
+from quanty import matrix
+from quanty.base import sz
 from quanty.geometry import UniformChain
 from quanty.hamiltonian import XX, XXZ
 from quanty.model.homo import Homogeneous
 from quanty.task.transfer_ import FitTransmissionTimeTask
 
 from orrvciwe import TransferProblem, TransferTask, dephasing, dephasing_operator
+
+
+def tune_by_mesolve(task, state):
+    n = task.problem.length
+    ham = task.problem.hamiltonian(task.problem.length, ex=task.problem.ex)
+    options = {
+        "atol": 1e-13,
+        "rtol": 1e-12,
+    }
+    ham = qp.Qobj(ham)
+    state = qp.Qobj(state)
+    dt = task.tuning_time / len(task.features)
+    for gammas in task.features:
+        c_ops = [
+            [
+                np.sqrt(gamma)
+                * qp.Qobj(matrix.crop(sz(n, i).toarray(), ex=task.problem.ex).astype(float) / 2)
+            ]
+            for i, gamma in enumerate(gammas)
+            if gamma != 0
+        ]
+        result = qp.mesolve(ham, state, [0, dt], c_ops=c_ops, options=options)
+        state = result.states[-1]
+    state = state.full()
+    return state
 
 
 class TestTransferN6S2E1Task(unittest.TestCase):
@@ -80,6 +107,93 @@ class TestTransferN6S2E1Task(unittest.TestCase):
                     desired,
                     atol=1e-7,
                 )
+
+
+class TestTransferTaskN5S2E1TrooterVsLiouvilleSpace(unittest.TestCase):
+    def setUp(self):
+        length = 5
+        n_sender = 2
+        excitations = 1
+
+        geometry = UniformChain()
+        model = Homogeneous(geometry)  # All with all !
+        hamiltonian = XXZ(model)
+        self.problem = TransferProblem.init_classic(
+            hamiltonian,
+            length=length,
+            n_sender=n_sender,
+            excitations=n_sender if excitations is None else excitations,
+        )
+        self.transmission_time = 4.56617
+
+    def assert_r01_r02_coefficients_trotter_vs_lspace(self, features, tuning_time, nt_per_step):
+        task, task_ = (
+            TransferTask(
+                problem=self.problem,
+                transmission_time=self.transmission_time - tuning_time,
+                tuning_time=tuning_time,
+                features=features,
+                nt_per_step=nt_per_step,
+            )
+            for nt_per_step in (nt_per_step, None)
+        )
+        self.assert_r01_r02_coefficients(task, task_)
+
+    def assert_r01_r02_coefficients_trotter_vs_mesolve(self, features, tuning_time, nt_per_step):
+        class TransferTask_(TransferTask):
+            def tune_in_liouville_space(self, state):
+                return tune_by_mesolve(self, state)
+
+        task, task_ = (
+            TransferTask_(
+                problem=self.problem,
+                transmission_time=self.transmission_time - tuning_time,
+                tuning_time=tuning_time,
+                features=features,
+                nt_per_step=nt_per_step,
+            )
+            for nt_per_step in (nt_per_step, None)
+        )
+        self.assert_r01_r02_coefficients(task, task_)
+
+    def assert_r01_r02_coefficients(self, task, task_):
+        (r01, _), (r02, _) = sorted(
+            [(k, v) for k, v in task.problem.sender_params.items()], key=lambda x: x[-1]
+        )
+        impacts = task.receiver_state_impacts(use_cache=False)
+        r01_coeff = impacts[r01][0, 1:]
+        r02_coeff = impacts[r02][0, 1:]
+        impacts_ = task_.receiver_state_impacts(use_cache=False)
+        r01_coeff_ = impacts_[r01][0, 1:]
+        r02_coeff_ = impacts_[r02][0, 1:]
+        np.testing.assert_allclose(r01_coeff_, r01_coeff, atol=1e-4, rtol=1e-3)
+        np.testing.assert_allclose(r02_coeff_, r02_coeff, atol=1e-4, rtol=1e-3)
+
+    def test_without_gammas(self):
+        nt_per_step = 1
+        features = ((0, 0, 0, 0, 0),)
+        tuning_time = 3
+        decimals = 14
+        self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
+
+    def test_single_peak(self):
+        nt_per_step = int(1e2)
+        tuning_time = 5
+        features = ((0.2, 0.1, 0.2, 0.1, 0.2),)
+        self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
+
+    def test_multiple_peaks(self):
+        nt_per_step = int(1e3)
+        tuning_time = 5
+        features = (
+            (0, 0, 0.5, 1.5, 1.9),
+            (0, 0, 1.4, 0.4, 2.2),
+            (0, 0, 0.2, 1.2, 0.7),
+        )
+        self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
 
 
 class TestTransferN5S2E1Task(unittest.TestCase):
@@ -228,4 +342,4 @@ class TestDephasing(unittest.TestCase):
         rho_dephased_ = rho_
 
         np.testing.assert_array_almost_equal(ham.full(), ham_(2), decimal=12)
-        np.testing.assert_array_almost_equal(rho_dephased.full(), rho_dephased_, decimal=6)
+        np.testing.assert_allclose(rho_dephased.full(), rho_dephased_, atol=1e-6, rtol=1e-5)

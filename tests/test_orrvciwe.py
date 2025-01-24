@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 import qutip as qp
+import scipy.linalg
 from quanty import matrix
 from quanty.base import sz
 from quanty.geometry import UniformChain
@@ -9,7 +10,16 @@ from quanty.hamiltonian import XX, XXZ
 from quanty.model.homo import Homogeneous
 from quanty.task.transfer_ import FitTransmissionTimeTask
 
-from orrvciwe import TransferProblem, TransferTask, dephasing, dephasing_operator
+from orrvciwe import (
+    TransferProblem,
+    TransferTask,
+    dephasing,
+    dephasing_operator,
+    dephasing_superoperator,
+    indentity_like,
+    left_superoperator,
+    right_superoperator,
+)
 
 
 def tune_by_mesolve(task, state):
@@ -34,6 +44,31 @@ def tune_by_mesolve(task, state):
         result = qp.mesolve(ham, state, [0, dt], c_ops=c_ops, options=options)
         state = result.states[-1]
     state = state.full()
+    return state
+
+
+def tune_by_trotterization_in_liouville_space(task, state):
+    n_state_rows = state.shape[0]
+    state = state.transpose().flatten().reshape(-1, 1)
+    nt = task.nt_per_step * len(task.features)
+    tt = task.tuning_time / nt
+    ham = task.problem.hamiltonian(task.problem.length, ex=task.problem.ex)
+    super_ham = left_superoperator(ham) - right_superoperator(ham)
+    super_ham_u = scipy.linalg.expm(-1j * super_ham * tt)
+    gammas = iter(task.features)
+    super_do = dephasing_superoperator(next(gammas), ex=task.problem.ex)
+    super_do_u = scipy.linalg.expm(super_do * tt)
+    t = 0
+    for it in range(nt):
+        if it != 0 and it % task.nt_per_step == 0:
+            super_do = dephasing_superoperator(next(gammas), ex=task.problem.ex)
+            super_do_u = scipy.linalg.expm(super_do * tt)
+        if super_do_u.shape == (1, 1):
+            super_do_u = indentity_like(super_ham_u) * super_do_u[0, 0]
+        state = super_do_u @ state
+        state = super_ham_u @ state
+        t += tt
+    state = state.reshape(n_state_rows, -1).T
     return state
 
 
@@ -156,6 +191,25 @@ class TestTransferTaskN5S2E1TrooterVsLiouvilleSpace(unittest.TestCase):
         )
         self.assert_r01_r02_coefficients(task, task_)
 
+    def assert_r01_r02_coefficients_trotter_vs_lspace_trotter(
+        self, features, tuning_time, nt_per_step
+    ):
+        class TransferTask_(TransferTask):
+            def tune_by_trotterization(self, state):
+                return tune_by_trotterization_in_liouville_space(self, state)
+
+        task, task_ = (
+            cls(
+                problem=self.problem,
+                transmission_time=self.transmission_time - tuning_time,
+                tuning_time=tuning_time,
+                features=features,
+                nt_per_step=nt_per_step,
+            )
+            for cls in (TransferTask, TransferTask_)
+        )
+        self.assert_r01_r02_coefficients(task_, task)
+
     def assert_r01_r02_coefficients(self, task, task_):
         (r01, _), (r02, _) = sorted(
             [(k, v) for k, v in task.problem.sender_params.items()], key=lambda x: x[-1]
@@ -176,6 +230,7 @@ class TestTransferTaskN5S2E1TrooterVsLiouvilleSpace(unittest.TestCase):
         decimals = 14
         self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
         self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_lspace_trotter(features, tuning_time, 1)
 
     def test_single_peak(self):
         nt_per_step = int(1e2)
@@ -183,6 +238,7 @@ class TestTransferTaskN5S2E1TrooterVsLiouvilleSpace(unittest.TestCase):
         features = ((0.2, 0.1, 0.2, 0.1, 0.2),)
         self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
         self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_lspace_trotter(features, tuning_time, 10)
 
     def test_multiple_peaks(self):
         nt_per_step = int(1e3)
@@ -194,6 +250,7 @@ class TestTransferTaskN5S2E1TrooterVsLiouvilleSpace(unittest.TestCase):
         )
         self.assert_r01_r02_coefficients_trotter_vs_lspace(features, tuning_time, nt_per_step)
         self.assert_r01_r02_coefficients_trotter_vs_mesolve(features, tuning_time, nt_per_step)
+        self.assert_r01_r02_coefficients_trotter_vs_lspace_trotter(features, tuning_time, 10)
 
 
 class TestTransferN5S2E1Task(unittest.TestCase):
